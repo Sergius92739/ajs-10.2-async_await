@@ -5,8 +5,7 @@ import json from '../parser';
 jest.mock('../parser');
 
 const data = '{"id":9,"created":1546300800,"userInfo":{"id":1,"name":"Hitman","level":10,"points":2000}}';
-const badData = '{id":9,"created":1546300800,"userInfo":{"id":1,"name":"Hitman","level":10,"points":2000}}';
-const hitman = new GameSaving('{"id":9,"created":1546300800,"userInfo":{"id":1,"name":"Hitman","level":10,"points":2000}}');
+const hitman = new GameSaving(data);
 
 beforeEach(() => {
   jest.resetAllMocks();
@@ -35,7 +34,7 @@ test('Метод должен вернуть объект с валидными 
 });
 
 test('метод load должен быбросить ошибку', async () => {
-  json.mockReturnValue(badData);
+  json.mockReturnValue(new Error());
   expect.assertions(1);
-  await expect(GameSavingLoader.load()).rejects.toThrow(new Error('Unexpected token i in JSON at position 1'));
+  await expect(GameSavingLoader.load()).rejects.toThrow(new Error('Unexpected token E in JSON at position 0'));
 });
