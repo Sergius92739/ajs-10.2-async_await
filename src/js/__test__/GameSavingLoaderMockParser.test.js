@@ -1,24 +1,23 @@
 import GameSaving from '../GameSaving';
 import GameSavingLoader from '../GameSavingLoader';
 import json from '../parser';
+import testData from './__fixtures__/input.fixtures';
 
 jest.mock('../parser');
 
-const data = '{"id":9,"created":1546300800,"userInfo":{"id":1,"name":"Hitman","level":10,"points":2000}}';
-const hitman = new GameSaving(data);
+const hitman = new GameSaving(testData);
 
-beforeEach(() => {
-  jest.resetAllMocks();
+afterEach(() => {
+  jest.clearAllMocks();
 });
 
 test('метод load должен вернуть объект', async () => {
-  json.mockReturnValue(data);
-  const testCase = await GameSavingLoader.load();
-  expect(testCase).toEqual(hitman);
+  json.mockResolvedValue(testData);
+  await expect(GameSavingLoader.load()).resolves.toEqual(hitman);
 });
 
 test('Метод должен вернуть объект с валидными данными', async () => {
-  json.mockReturnValue(data);
+  json.mockResolvedValue(testData);
   const testObj = {
     id: 9,
     created: 1546300800,
@@ -29,12 +28,11 @@ test('Метод должен вернуть объект с валидными 
       points: 2000,
     },
   };
-  const userData = await GameSavingLoader.load();
-  expect(userData).toEqual(testObj);
+  await expect(GameSavingLoader.load()).resolves.toEqual(testObj);
 });
 
 test('метод load должен быбросить ошибку', async () => {
-  json.mockReturnValue(new Error());
+  json.mockRejectedValue(new Error());
   expect.assertions(1);
-  await expect(GameSavingLoader.load()).rejects.toThrow(new Error('Unexpected token E in JSON at position 0'));
+  await expect(GameSavingLoader.load()).rejects.toThrow(new Error());
 });
